@@ -1,4 +1,4 @@
-import events from '../events';
+import events from '../utils/events';
 
 const buildTodoElement = (todo, id) => {
   const todoElem = document.createElement('div');

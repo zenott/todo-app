@@ -1,6 +1,6 @@
-import events from './events';
-import Project from './project';
-import Todo from './todo';
+import events from './utils/events';
+import Project from './objects/project';
+import Todo from './objects/todo';
 import './UIComponents/layout';
 import './UIComponents/project';
 import './UIComponents/todo';

@@ -1,4 +1,4 @@
-import events from '../events';
+import events from '../utils/events';
 
 const buildProjectElement = (project, id) => {
   const projectElem = document.createElement('div');

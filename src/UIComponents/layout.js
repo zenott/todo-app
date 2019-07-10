@@ -1,4 +1,4 @@
-import events from '../events';
+import events from '../utils/events';
 import buildProjectForm from './project';
 import buildNewTodoForm from './todo';
 
