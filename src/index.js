@@ -1,4 +1,4 @@
-import events from './utils/events';
+import * as events from './utils/events';
 import Project from './objects/project';
 import Todo from './objects/todo';
 import './UIComponents/layout';
@@ -30,13 +30,15 @@ const editProject = (name, id) => {
 events.on('editProject', editProject);
 
 const deleteProject = id => {
+  let todos;
   projects.splice(id, 1);
   if (id === activeProject) {
-    if (activeProject > 0) activeProject--;
-    console.log(activeProject);
-    events.emit('renderTodos', projects[activeProject].todos);
+    activeProject--;
   }
+  if (projects[activeProject]) todos = projects[activeProject].todos;
+  else todos = [];
   events.emit('renderProjects', projects);
+  events.emit('renderTodos', todos);
 };
 
 events.on('deleteProject', deleteProject);
@@ -48,19 +50,6 @@ const addNewTodo = todo => {
 };
 
 events.on('addNewTodo', addNewTodo);
-
-const showTodo = (id, node) => {
-  events.emit('showTodoElem', projects[activeProject].todos[id], node);
-};
-
-events.on('showTodo', showTodo);
-
-const showEditTodoForm = (id, node) => {
-  const todo = projects[activeProject].todos[id];
-  events.emit('renderEditTodoForm', todo, node);
-};
-
-events.on('showEditTodoForm', showEditTodoForm);
 
 const editTodo = (id, todo) => {
   projects[activeProject].todos[id] = Todo(...todo);

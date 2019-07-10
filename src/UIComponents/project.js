@@ -1,8 +1,8 @@
-import events from '../utils/events';
+import * as events from '../utils/events';
 
 const buildProjectElement = (project, id) => {
   const projectElem = document.createElement('div');
-  projectElem.dataset.id = id;
+  projectElem.dataset.pid = id;
   projectElem.classList.add('project');
   projectElem.textContent = project.name;
   projectElem.addEventListener('click', projectClick);
@@ -17,19 +17,24 @@ const buildProjectElement = (project, id) => {
   del.textContent = 'delete';
   projectElem.appendChild(del);
 
+  const editProjectFrom = buildProjectForm(true);
+  editProjectFrom.classList.add('edit-form', 'hide');
+  projectElem.appendChild(editProjectFrom);
+
   return projectElem;
 };
 
 const projectClick = e => {
   if (e.target.classList.contains('project')) {
-    const id = e.target.dataset.id;
+    const id = e.target.dataset.pid;
     events.emit('setActiveProject', id);
   } else if (e.target.classList.contains('delete-project')) {
-    const id = e.target.parentNode.dataset.id;
+    const id = e.target.parentNode.dataset.pid;
     events.emit('deleteProject', id);
   } else if (e.target.classList.contains('edit-project')) {
-    const projectForm = buildProjectForm(true);
-    e.target.parentNode.appendChild(projectForm);
+    const node = e.target.parentNode.querySelector('.edit-form');
+    console.log(node);
+    node.classList.toggle('hide');
   }
 };
 
@@ -64,12 +69,12 @@ const buildProjectForm = (edit = false) => {
 const projectFormSubmit = (e, edit = false) => {
   e.preventDefault();
   const projectName = e.target[0].value;
-  if (!edit) {
-    events.emit('addNewProject', projectName);
-  } else {
-    const id = e.target.parentNode.dataset.id;
+  if (edit) {
+    const id = e.target.parentNode.dataset.pid;
     console.log(e.target.parentNode);
     events.emit('editProject', projectName, id);
+  } else {
+    events.emit('addNewProject', projectName);
   }
   e.target.reset();
 };
