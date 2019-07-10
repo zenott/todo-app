@@ -1,25 +1,17 @@
-class Events {
-  constructor() {
-    this.events = {};
-  }
+const eventsObj = {};
 
-  on(eventName, fn) {
-    if (this.events[eventName]) {
-      this.events[eventName].push(fn);
-    } else {
-      this.events[eventName] = [fn];
-    }
-  }
-
-  emit(eventName, ...args) {
-    if (this.events[eventName]) {
-      this.events[eventName].forEach(fn => {
-        fn(...args);
-      });
-    }
+export function on(eventName, fn) {
+  if (eventsObj[eventName]) {
+    eventsObj[eventName].push(fn);
+  } else {
+    eventsObj[eventName] = [fn];
   }
 }
 
-const events = new Events();
-
-export default events;
+export function emit(eventName, ...args) {
+  if (eventsObj[eventName]) {
+    eventsObj[eventName].forEach(fn => {
+      fn(...args);
+    });
+  }
+}
