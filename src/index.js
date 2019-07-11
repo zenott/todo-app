@@ -7,16 +7,6 @@ import './UIComponents/project';
 import './UIComponents/todo';
 import './style.scss';
 
-let activeProject = 0;
-
-events.emit('init');
-
-const projects = storage.getData();
-
-events.emit('renderProjects', projects);
-
-events.emit('renderTodos', projects[activeProject].todos);
-
 const addNewProject = name => {
   const newProject = Project(name);
   projects.push(newProject);
@@ -80,3 +70,13 @@ const setActiveProject = id => {
 };
 
 events.on('setActiveProject', setActiveProject);
+
+let activeProject = 0;
+
+events.emit('init');
+
+const projects = storage.getData();
+
+events.emit('renderProjects', projects);
+
+events.emit('renderTodos', projects[activeProject].todos);

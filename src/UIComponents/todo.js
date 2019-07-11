@@ -1,4 +1,5 @@
 import * as events from '../utils/events';
+import { distanceInWordsToNow } from 'date-fns';
 
 const buildTodoElement = (todo, id) => {
   const todoElem = document.createElement('div');
@@ -79,14 +80,23 @@ const todoFormSubmit = e => {
 const buildShowTodoElem = todo => {
   const showTodo = document.createElement('div');
   const title = document.createElement('div');
+  title.classList.add('title');
   title.textContent = todo.title;
   const desc = document.createElement('div');
+  desc.classList.add('desc');
   desc.textContent = todo.description;
   const dueDate = document.createElement('div');
-  dueDate.textContent = todo.dueDate;
+  dueDate.classList.add('due-date');
+  dueDate.textContent = todo.dueDate
+    ? distanceInWordsToNow(todo.dueDate, {
+        addSuffix: true
+      })
+    : '-';
   const priority = document.createElement('div');
+  priority.classList.add('priority');
   priority.textContent = todo.priority;
   const done = document.createElement('div');
+  done.classList.add('done');
   done.textContent = todo.done;
 
   showTodo.appendChild(title);
@@ -108,15 +118,25 @@ events.on('showTodo', showTodo);
 const buildEditTodoForm = todo => {
   const editTodo = document.createElement('form');
   const title = document.createElement('input');
+  title.type = 'text';
   title.value = todo.title || '';
-  const desc = document.createElement('input');
+  const desc = document.createElement('textarea');
   desc.value = todo.description || '';
   const dueDate = document.createElement('input');
+  dueDate.type = 'datetime-local';
   dueDate.value = todo.dueDate || '';
-  const priority = document.createElement('input');
-  priority.value = todo.priority || '';
+  const priority = document.createElement('select');
+  const normal = document.createElement('option');
+  normal.textContent = 'normal';
+  normal.selected = todo.priority === normal.text;
+  const urgent = document.createElement('option');
+  urgent.textContent = 'urgent';
+  urgent.selected = todo.priority === urgent.text;
+  priority.appendChild(normal);
+  priority.appendChild(urgent);
   const done = document.createElement('input');
-  done.value = todo.done || '';
+  done.type = 'checkbox';
+  done.checked = todo.isDone;
   const submit = document.createElement('input');
   submit.type = 'submit';
 
@@ -136,9 +156,9 @@ const editTodoSubmit = e => {
   const id = e.target.parentNode.dataset.tid;
   const title = e.target[0].value;
   const desc = e.target[1].value;
-  const due = e.target[2].value;
+  const due = new Date(e.target[2].value);
   const priority = e.target[3].value;
-  const done = e.target[4].value;
+  const done = e.target[4].checked;
   events.emit('editTodo', id, [title, desc, due, priority, done]);
 };
 

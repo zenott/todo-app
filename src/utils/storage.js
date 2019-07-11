@@ -18,7 +18,6 @@ function setInitialData() {
 events.on('init', setInitialData);
 
 export function setData(data) {
-  console.log(data);
   localStorage.setItem(storeName, JSON.stringify(data));
 }
 

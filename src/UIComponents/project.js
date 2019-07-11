@@ -33,13 +33,11 @@ const projectClick = e => {
     events.emit('deleteProject', id);
   } else if (e.target.classList.contains('edit-project')) {
     const node = e.target.parentNode.querySelector('.edit-form');
-    console.log(node);
     node.classList.toggle('hide');
   }
 };
 
 const renderProjects = projects => {
-  console.log(projects);
   const projectsElem = document.querySelector('.projects');
   [...projectsElem.children].forEach(el => {
     if (el.classList.contains('project')) el.remove();
@@ -71,7 +69,6 @@ const projectFormSubmit = (e, edit = false) => {
   const projectName = e.target[0].value;
   if (edit) {
     const id = e.target.parentNode.dataset.pid;
-    console.log(e.target.parentNode);
     events.emit('editProject', projectName, id);
   } else {
     events.emit('addNewProject', projectName);
