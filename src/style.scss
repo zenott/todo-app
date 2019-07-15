@@ -1,3 +1,66 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+#root {
+  width: 700px;
+  margin: 0 auto;
+}
+
+.main {
+  display: flex;
+
+  .projects {
+    flex: 1;
+    background-color: #dfe1e6;
+    border-radius: 3px;
+    margin-right: 5px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+
+    form {
+      display: flex;
+    }
+  }
+
+  .todos {
+    flex: 2.2;
+    background-color: #dfe1e6;
+    border-radius: 3px;
+    margin-right: 5px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .project,
+  .todo,
+  .new-project,
+  .new-todo {
+    border: 1px solid #a5a5a5;
+    margin: 3px 0;
+    padding: 8px;
+    border-radius: 3px;
+  }
+
+  .project-main {
+    display: flex;
+
+    .edit-project {
+      margin-left: auto;
+    }
+  }
+}
+
 .hide {
-  display: none;
+  display: none !important;
 }

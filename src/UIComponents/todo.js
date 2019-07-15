@@ -22,8 +22,8 @@ const buildTodoElement = (todo, id) => {
   short.addEventListener('click', todoClick);
   todoElem.appendChild(short);
 
-  const showTodo = buildShowTodoElem(todo);
-  showTodo.classList.add('show', 'hide');
+  const showTodo = buildShowMoreElem(todo);
+  showTodo.classList.add('more', 'hide');
   todoElem.appendChild(showTodo);
 
   const editForm = buildEditTodoForm(todo);
@@ -35,8 +35,8 @@ const buildTodoElement = (todo, id) => {
 
 const todoClick = e => {
   if (e.target.classList.contains('short')) {
-    const id = e.target.parentNode.dataset.tid;
-    events.emit('showTodo', id);
+    const node = e.target.parentNode;
+    events.emit('showMore', node);
   } else if (e.target.classList.contains('delete-todo')) {
     const id = e.target.parentNode.dataset.tid;
     events.emit('deleteTodo', id);
@@ -48,10 +48,14 @@ const todoClick = e => {
 
 const renderTodos = todos => {
   const todosElem = document.querySelector('.todos');
+  const newTodo = document.querySelector('.todos > .new-todo');
   [...todosElem.children].forEach(el => {
     if (el.classList.contains('todo')) el.remove();
   });
-  todos.forEach((todo, i) => todosElem.appendChild(buildTodoElement(todo, i)));
+  todos.forEach((todo, i) => {
+    const todoElem = buildTodoElement(todo, i);
+    todosElem.insertBefore(todoElem, newTodo);
+  });
 };
 
 events.on('renderTodos', renderTodos);
@@ -60,13 +64,18 @@ const buildNewTodoForm = () => {
   const form = document.createElement('form');
   const titleInput = document.createElement('input');
   titleInput.classList.add('todo-title-input');
+  titleInput.required = true;
   const submit = document.createElement('input');
   submit.type = 'submit';
+  const cancel = document.createElement('div');
+  cancel.classList.add('cancel');
+  cancel.textContent = 'Cancel';
+  cancel.addEventListener('click', toggleNewTodo);
 
   form.appendChild(titleInput);
   form.appendChild(submit);
+  form.appendChild(cancel);
   form.addEventListener('submit', todoFormSubmit);
-
   return form;
 };
 
@@ -77,11 +86,8 @@ const todoFormSubmit = e => {
   e.target.reset();
 };
 
-const buildShowTodoElem = todo => {
-  const showTodo = document.createElement('div');
-  const title = document.createElement('div');
-  title.classList.add('title');
-  title.textContent = todo.title;
+const buildShowMoreElem = todo => {
+  const showMore = document.createElement('div');
   const desc = document.createElement('div');
   desc.classList.add('desc');
   desc.textContent = todo.description;
@@ -99,32 +105,33 @@ const buildShowTodoElem = todo => {
   done.classList.add('done');
   done.textContent = todo.done;
 
-  showTodo.appendChild(title);
-  showTodo.appendChild(desc);
-  showTodo.appendChild(dueDate);
-  showTodo.appendChild(priority);
-  showTodo.appendChild(done);
+  showMore.appendChild(desc);
+  showMore.appendChild(dueDate);
+  showMore.appendChild(priority);
+  showMore.appendChild(done);
 
-  return showTodo;
+  return showMore;
 };
 
-const showTodo = id => {
-  const node = document.querySelector(`[data-tid="${id}"] .show`);
-  node.classList.toggle('hide');
+const showMore = node => {
+  const more = node.querySelector('.more');
+  const edit = node.querySelector('.edit');
+  more.classList.toggle('hide');
+  edit.classList.add('hide');
 };
 
-events.on('showTodo', showTodo);
+events.on('showMore', showMore);
 
 const buildEditTodoForm = todo => {
   const editTodo = document.createElement('form');
   const title = document.createElement('input');
   title.type = 'text';
-  title.value = todo.title || '';
+  title.defaultValue = todo.title || '';
   const desc = document.createElement('textarea');
-  desc.value = todo.description || '';
+  desc.defaultValue = todo.description || '';
   const dueDate = document.createElement('input');
-  dueDate.type = 'datetime-local';
-  dueDate.value = todo.dueDate || '';
+  dueDate.type = 'date';
+  dueDate.defaultValue = todo.dueDate || '';
   const priority = document.createElement('select');
   const normal = document.createElement('option');
   normal.textContent = 'normal';
@@ -139,6 +146,9 @@ const buildEditTodoForm = todo => {
   done.checked = todo.isDone;
   const submit = document.createElement('input');
   submit.type = 'submit';
+  const cancel = document.createElement('div');
+  cancel.textContent = 'Cancel';
+  cancel.addEventListener('click', () => cancelForm(editTodo));
 
   editTodo.appendChild(title);
   editTodo.appendChild(desc);
@@ -146,9 +156,21 @@ const buildEditTodoForm = todo => {
   editTodo.appendChild(priority);
   editTodo.appendChild(done);
   editTodo.appendChild(submit);
+  editTodo.appendChild(cancel);
   editTodo.addEventListener('submit', editTodoSubmit);
 
   return editTodo;
+};
+
+const cancelForm = form => {
+  form.reset();
+  const node = form.parentNode;
+  const edit = node.querySelector('.edit');
+  edit.classList.add('hide');
+  const short = node.querySelector('.short');
+  short.classList.remove('hide');
+  const more = node.querySelector('.more');
+  more.classList.remove('hide');
 };
 
 const editTodoSubmit = e => {
@@ -163,10 +185,20 @@ const editTodoSubmit = e => {
 };
 
 const showEditTodo = node => {
-  const show = node.querySelector('.edit');
-  show.classList.toggle('hide');
+  const edit = node.querySelector('.edit');
+  edit.classList.toggle('hide');
+  const short = node.querySelector('.short');
+  short.classList.toggle('hide');
+  const more = node.querySelector('.more');
+  more.classList.add('hide');
 };
 
 events.on('showEditTodo', showEditTodo);
 
-export default buildNewTodoForm;
+const toggleNewTodo = () => {
+  console.log('ran');
+  document.querySelector('.new-todo-button').classList.toggle('hide');
+  document.querySelector('.new-todo-form').classList.toggle('hide');
+};
+
+export { buildNewTodoForm, toggleNewTodo };
