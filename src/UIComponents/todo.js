@@ -1,23 +1,34 @@
 import * as events from '../utils/events';
-import { distanceInWordsToNow } from 'date-fns';
+import distanceInWordsToNow from 'date-fns/distance_in_words_to_now';
+import format from 'date-fns/format';
 
 const buildTodoElement = (todo, id) => {
   const todoElem = document.createElement('div');
   todoElem.dataset.tid = id;
   todoElem.classList.add('todo');
+  if (todo.priority === 'urgent') todoElem.classList.add('urgent');
 
   const short = document.createElement('div');
   short.classList.add('short');
-  short.textContent = todo.title;
+  const done = document.createElement('input');
+  done.type = 'checkbox';
+  done.id = 'chbox-' + id;
+  done.checked = todo.isDone;
+  const doneLabel = document.createElement('label');
+  doneLabel.htmlFor = 'chbox-' + id;
+  const title = document.createElement('div');
+  title.classList.add('title');
+  title.textContent = todo.title;
+  short.appendChild(done);
+  short.appendChild(doneLabel);
+  short.appendChild(title);
 
-  const edit = document.createElement('div');
-  edit.classList.add('edit-todo');
-  edit.textContent = 'edit';
+  const edit = document.createElement('i');
+  edit.classList.add('edit-todo', 'far', 'fa-edit');
   short.appendChild(edit);
 
-  const del = document.createElement('div');
-  del.classList.add('delete-todo');
-  del.textContent = 'delete';
+  const del = document.createElement('i');
+  del.classList.add('delete-todo', 'fas', 'fa-trash-alt');
   short.appendChild(del);
   short.addEventListener('click', todoClick);
   todoElem.appendChild(short);
@@ -26,7 +37,7 @@ const buildTodoElement = (todo, id) => {
   showTodo.classList.add('more', 'hide');
   todoElem.appendChild(showTodo);
 
-  const editForm = buildEditTodoForm(todo);
+  const editForm = buildEditTodoForm(todo, id);
   editForm.classList.add('edit', 'hide');
   todoElem.appendChild(editForm);
 
@@ -37,12 +48,19 @@ const todoClick = e => {
   if (e.target.classList.contains('short')) {
     const node = e.target.parentNode;
     events.emit('showMore', node);
+  } else if (e.target.classList.contains('title')) {
+    const node = e.target.parentNode.parentNode;
+    events.emit('showMore', node);
   } else if (e.target.classList.contains('delete-todo')) {
     const id = e.target.parentNode.dataset.tid;
     events.emit('deleteTodo', id);
   } else if (e.target.classList.contains('edit-todo')) {
     const node = e.target.parentNode.parentNode;
     events.emit('showEditTodo', node);
+  } else if ((e.target.type = 'checkbox')) {
+    const id = e.target.id.split('-')[1];
+    const todo = { isDone: e.target.checked };
+    if (id) events.emit('editTodo', id, todo);
   }
 };
 
@@ -65,11 +83,14 @@ const buildNewTodoForm = () => {
   const titleInput = document.createElement('input');
   titleInput.classList.add('todo-title-input');
   titleInput.required = true;
-  const submit = document.createElement('input');
+  titleInput.placeholder = 'Enter todo title';
+  const submit = document.createElement('button');
   submit.type = 'submit';
-  const cancel = document.createElement('div');
-  cancel.classList.add('cancel');
-  cancel.textContent = 'Cancel';
+  const check = document.createElement('i');
+  check.classList.add('submit-button', 'fas', 'fa-check');
+  submit.appendChild(check);
+  const cancel = document.createElement('i');
+  cancel.classList.add('cancel', 'fas', 'fa-times');
   cancel.addEventListener('click', toggleNewTodo);
 
   form.appendChild(titleInput);
@@ -88,27 +109,40 @@ const todoFormSubmit = e => {
 
 const buildShowMoreElem = todo => {
   const showMore = document.createElement('div');
+  const descRow = document.createElement('div');
+  const descIcon = document.createElement('i');
+  descIcon.classList.add('far', 'fa-comment-alt');
+  descRow.appendChild(descIcon);
   const desc = document.createElement('div');
   desc.classList.add('desc');
-  desc.textContent = todo.description;
+  desc.textContent = todo.description || 'no description set';
+  descRow.appendChild(desc);
+
+  const dueRow = document.createElement('div');
+  const dueIcon = document.createElement('i');
+  dueIcon.classList.add('far', 'fa-calendar-alt');
+  dueRow.appendChild(dueIcon);
   const dueDate = document.createElement('div');
   dueDate.classList.add('due-date');
   dueDate.textContent = todo.dueDate
     ? distanceInWordsToNow(todo.dueDate, {
         addSuffix: true
       })
-    : '-';
+    : 'no due date set';
+  dueRow.appendChild(dueDate);
+
+  const priorityRow = document.createElement('div');
+  const priorityIcon = document.createElement('i');
+  priorityIcon.classList.add('fas', 'fa-exclamation-triangle');
+  priorityRow.appendChild(priorityIcon);
   const priority = document.createElement('div');
   priority.classList.add('priority');
-  priority.textContent = todo.priority;
-  const done = document.createElement('div');
-  done.classList.add('done');
-  done.textContent = todo.done;
+  priority.textContent = todo.priority || 'no priority set';
+  priorityRow.appendChild(priority);
 
-  showMore.appendChild(desc);
-  showMore.appendChild(dueDate);
-  showMore.appendChild(priority);
-  showMore.appendChild(done);
+  showMore.appendChild(descRow);
+  showMore.appendChild(dueRow);
+  showMore.appendChild(priorityRow);
 
   return showMore;
 };
@@ -122,16 +156,44 @@ const showMore = node => {
 
 events.on('showMore', showMore);
 
-const buildEditTodoForm = todo => {
+const buildEditTodoForm = (todo, id) => {
   const editTodo = document.createElement('form');
+
+  const titleRow = document.createElement('div');
   const title = document.createElement('input');
   title.type = 'text';
   title.defaultValue = todo.title || '';
+  const done = document.createElement('input');
+  done.type = 'checkbox';
+  done.id = 'checkbox-' + id;
+  done.checked = todo.isDone;
+  const doneLabel = document.createElement('label');
+  doneLabel.htmlFor = 'checkbox-' + id;
+  titleRow.appendChild(done);
+  titleRow.appendChild(doneLabel);
+  titleRow.appendChild(title);
+
+  const descRow = document.createElement('div');
+  const descIcon = document.createElement('i');
+  descIcon.classList.add('far', 'fa-comment-alt');
   const desc = document.createElement('textarea');
   desc.defaultValue = todo.description || '';
+  desc.placeholder = 'Add descripition';
+  descRow.appendChild(descIcon);
+  descRow.appendChild(desc);
+
+  const dueRow = document.createElement('div');
+  const dueIcon = document.createElement('i');
+  dueIcon.classList.add('far', 'fa-calendar-alt');
   const dueDate = document.createElement('input');
   dueDate.type = 'date';
-  dueDate.defaultValue = todo.dueDate || '';
+  dueDate.defaultValue = format(todo.dueDate, 'YYYY-MM-DD') || '';
+  dueRow.appendChild(dueIcon);
+  dueRow.appendChild(dueDate);
+
+  const priorityRow = document.createElement('div');
+  const priorityIcon = document.createElement('i');
+  priorityIcon.classList.add('fas', 'fa-exclamation-triangle');
   const priority = document.createElement('select');
   const normal = document.createElement('option');
   normal.textContent = 'normal';
@@ -141,20 +203,27 @@ const buildEditTodoForm = todo => {
   urgent.selected = todo.priority === urgent.text;
   priority.appendChild(normal);
   priority.appendChild(urgent);
-  const done = document.createElement('input');
-  done.type = 'checkbox';
-  done.checked = todo.isDone;
-  const submit = document.createElement('input');
+  priorityRow.appendChild(priorityIcon);
+  priorityRow.appendChild(priority);
+
+  const submit = document.createElement('button');
   submit.type = 'submit';
-  const cancel = document.createElement('div');
-  cancel.textContent = 'Cancel';
+
+  const check = document.createElement('i');
+  check.classList.add('submit-button', 'fas', 'fa-check');
+  submit.appendChild(check);
+
+  const cancel = document.createElement('i');
+  cancel.classList.add('cancel', 'fas', 'fa-times');
   cancel.addEventListener('click', () => cancelForm(editTodo));
 
-  editTodo.appendChild(title);
-  editTodo.appendChild(desc);
-  editTodo.appendChild(dueDate);
-  editTodo.appendChild(priority);
-  editTodo.appendChild(done);
+  const inputsDiv = document.createElement('div');
+
+  inputsDiv.appendChild(titleRow);
+  inputsDiv.appendChild(descRow);
+  inputsDiv.appendChild(dueRow);
+  inputsDiv.appendChild(priorityRow);
+  editTodo.appendChild(inputsDiv);
   editTodo.appendChild(submit);
   editTodo.appendChild(cancel);
   editTodo.addEventListener('submit', editTodoSubmit);
@@ -176,12 +245,15 @@ const cancelForm = form => {
 const editTodoSubmit = e => {
   e.preventDefault();
   const id = e.target.parentNode.dataset.tid;
-  const title = e.target[0].value;
-  const desc = e.target[1].value;
-  const due = new Date(e.target[2].value);
-  const priority = e.target[3].value;
-  const done = e.target[4].checked;
-  events.emit('editTodo', id, [title, desc, due, priority, done]);
+  const todo = {
+    title: e.target[1].value,
+    description: e.target[2].value,
+    dueDate: e.target[3].value ? new Date(e.target[3].value) : '',
+    priority: e.target[4].value,
+    isDone: e.target[0].checked
+  };
+  events.emit('editTodo', id, todo);
+  showMore(document.querySelector(`[data-tid='${id}']`));
 };
 
 const showEditTodo = node => {
@@ -196,7 +268,6 @@ const showEditTodo = node => {
 events.on('showEditTodo', showEditTodo);
 
 const toggleNewTodo = () => {
-  console.log('ran');
   document.querySelector('.new-todo-button').classList.toggle('hide');
   document.querySelector('.new-todo-form').classList.toggle('hide');
 };

@@ -11,14 +11,12 @@ const buildProjectElement = (project, id) => {
 
   main.textContent = project.name;
 
-  const edit = document.createElement('div');
-  edit.classList.add('edit-project');
-  edit.textContent = 'edit';
+  const edit = document.createElement('i');
+  edit.classList.add('edit-project', 'far', 'fa-edit');
   main.appendChild(edit);
 
-  const del = document.createElement('div');
-  del.classList.add('delete-project');
-  del.textContent = 'delete';
+  const del = document.createElement('i');
+  del.classList.add('delete-project', 'fas', 'fa-trash-alt');
   main.appendChild(del);
   projectElem.appendChild(main);
 
@@ -32,10 +30,10 @@ const buildProjectElement = (project, id) => {
 const projectClick = e => {
   if (e.target.classList.contains('project-main')) {
     const id = e.target.parentNode.dataset.pid;
-    events.emit('setActiveProject', id);
+    events.emit('setActiveProject', Number(id));
   } else if (e.target.classList.contains('delete-project')) {
     const id = e.target.parentNode.parentNode.dataset.pid;
-    events.emit('deleteProject', id);
+    events.emit('deleteProject', Number(id));
   } else if (e.target.classList.contains('edit-project')) {
     const node = e.target.parentNode.parentNode;
     toggleView(node);
@@ -44,15 +42,17 @@ const projectClick = e => {
 
 const toggleView = node => {
   node.querySelector('.edit-form').classList.toggle('hide');
+  node.querySelector('.edit-form')[0].focus();
   node.querySelector('.project-main').classList.toggle('hide');
 };
 
 const toggleNewProject = () => {
-  document.querySelector('.new-project-button').classList.toggle('hide');
   document.querySelector('.new-project-form').classList.toggle('hide');
+  document.querySelector('.new-project-form')[0].focus();
+  document.querySelector('.new-project-button').classList.toggle('hide');
 };
 
-const renderProjects = projects => {
+const renderProjects = (projects, activeProject) => {
   const projectsElem = document.querySelector('.projects');
   const newProject = document.querySelector('.projects > .new-project');
   [...projectsElem.children].forEach(el => {
@@ -60,8 +60,14 @@ const renderProjects = projects => {
   });
   projects.forEach((project, i) => {
     const projectElem = buildProjectElement(project, i);
+    if (i === activeProject) projectElem.classList.add('active');
     projectsElem.insertBefore(projectElem, newProject);
   });
+  if (!projects.length) {
+    document.querySelector('.new-todo').classList.add('hide');
+  } else {
+    document.querySelector('.new-todo').classList.remove('hide');
+  }
 };
 
 events.on('renderProjects', renderProjects);
@@ -73,12 +79,13 @@ const buildProjectForm = (edit = false) => {
   input.required = true;
   input.classList.add('project-input');
   input.placeholder = edit ? 'Project name' : 'Add a project';
-  const submit = document.createElement('input');
-  submit.value = edit ? 'Save' : 'Add project';
+  const submit = document.createElement('button');
   submit.type = 'submit';
-  const cancel = document.createElement('div');
-  cancel.classList.add('cancel');
-  cancel.textContent = 'Cancel';
+  const check = document.createElement('i');
+  check.classList.add('submit-button', 'fas', 'fa-check');
+  submit.appendChild(check);
+  const cancel = document.createElement('i');
+  cancel.classList.add('cancel', 'fas', 'fa-times');
   cancel.addEventListener('click', cancelForm);
 
   form.appendChild(input);
@@ -91,7 +98,6 @@ const buildProjectForm = (edit = false) => {
 
 const cancelForm = e => {
   const node = e.target.parentNode.parentNode;
-  console.log(node);
   if (node.classList.contains('new-project')) {
     toggleNewProject();
   }
@@ -108,8 +114,18 @@ const projectFormSubmit = (e, edit = false) => {
     events.emit('editProject', projectName, id);
   } else {
     events.emit('addNewProject', projectName);
+    toggleNewProject();
   }
   e.target.reset();
 };
+
+const setActiveProject = id => {
+  const projects = document.querySelectorAll('.project');
+  [...projects].forEach(el => el.classList.remove('active'));
+  const node = document.querySelector(`[data-pid='${id}']`);
+  node.classList.add('active');
+};
+
+events.on('setActiveProject', setActiveProject);
 
 export { buildProjectForm, toggleNewProject };

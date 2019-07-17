@@ -11,7 +11,9 @@ const addNewProject = name => {
   const newProject = Project(name);
   projects.push(newProject);
   storage.setData(projects);
-  events.emit('renderProjects', projects);
+  activeProject = projects.length - 1;
+  events.emit('renderProjects', projects, activeProject);
+  events.emit('renderTodos', []);
 };
 
 events.on('addNewProject', addNewProject);
@@ -19,7 +21,7 @@ events.on('addNewProject', addNewProject);
 const editProject = (name, id) => {
   projects[id].name = name;
   storage.setData(projects);
-  events.emit('renderProjects', projects);
+  events.emit('renderProjects', projects, activeProject);
 };
 
 events.on('editProject', editProject);
@@ -27,13 +29,13 @@ events.on('editProject', editProject);
 const deleteProject = id => {
   let todos;
   projects.splice(id, 1);
-  if (id === activeProject) {
+  if (id <= activeProject) {
     activeProject--;
   }
   if (projects[activeProject]) todos = projects[activeProject].todos;
   else todos = [];
   storage.setData(projects);
-  events.emit('renderProjects', projects);
+  events.emit('renderProjects', projects, activeProject);
   events.emit('renderTodos', todos);
 };
 
@@ -48,8 +50,9 @@ const addNewTodo = todo => {
 
 events.on('addNewTodo', addNewTodo);
 
-const editTodo = (id, todo) => {
-  projects[activeProject].todos[id] = Todo(...todo);
+const editTodo = (id, newTodo) => {
+  const todo = projects[activeProject].todos[id];
+  projects[activeProject].todos[id] = { ...todo, ...newTodo };
   storage.setData(projects);
   events.emit('renderTodos', projects[activeProject].todos);
 };
@@ -66,6 +69,7 @@ events.on('deleteTodo', deleteTodo);
 
 const setActiveProject = id => {
   activeProject = id;
+  events.emit('renderProjects', projects, activeProject);
   events.emit('renderTodos', projects[activeProject].todos);
 };
 
@@ -77,6 +81,6 @@ events.emit('init');
 
 const projects = storage.getData();
 
-events.emit('renderProjects', projects);
+events.emit('renderProjects', projects, activeProject);
 
 events.emit('renderTodos', projects[activeProject].todos);

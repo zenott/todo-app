@@ -1,5 +1,194 @@
-body {
-  background: #123456; }
-  body title {
-    background: #789abc; }
+body,
+html {
+  margin: 0;
+  padding: 0;
+  background: #f5f5f5;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.25rem; }
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box; }
+
+#root {
+  width: 800px;
+  margin: 0 auto; }
+
+h1.title {
+  text-align: center;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.16), 0 1px 3px rgba(0, 0, 0, 0.23); }
+
+.main {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 30px; }
+  .main .projects {
+    flex: 1;
+    background-color: #dfe1e6;
+    border-radius: 3px;
+    margin-right: 15px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23); }
+    .main .projects .project-main {
+      display: flex;
+      align-items: center; }
+    .main .projects .new-project-form,
+    .main .projects .edit-form {
+      display: flex;
+      align-items: center; }
+  .main .todos {
+    flex: 1.5;
+    background-color: #dfe1e6;
+    border-radius: 3px;
+    padding: 10px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    display: flex;
+    flex-direction: column; }
+    .main .todos .short {
+      display: flex;
+      align-items: center; }
+      .main .todos .short .edit-todo {
+        margin-left: auto;
+        margin-right: 12px; }
+    .main .todos .more {
+      margin-top: 20px; }
+      .main .todos .more > * {
+        margin: 10px 0;
+        display: flex;
+        align-items: center; }
+      .main .todos .more i {
+        margin: 0 15px 0 23px;
+        width: 18px;
+        height: 18px; }
+    .main .todos .edit {
+      display: flex; }
+      .main .todos .edit > div {
+        display: flex;
+        flex-direction: column; }
+        .main .todos .edit > div > div {
+          display: flex;
+          align-items: center; }
+      .main .todos .edit i {
+        margin: 0 15px 0 23px;
+        width: 18px;
+        height: 18px; }
+      .main .todos .edit i.cancel,
+      .main .todos .edit i.submit-button {
+        align-self: center;
+        margin: 0; }
+      .main .todos .edit button[type='submit'] {
+        margin-left: auto;
+        margin-right: 15px; }
+    .main .todos input[type='text'] {
+      margin: 10px 0;
+      width: 83%; }
+    .main .todos textarea,
+    .main .todos input[type='date'],
+    .main .todos select {
+      margin: 10px 0;
+      width: 83%; }
+    .main .todos textarea {
+      resize: vertical;
+      position: relative; }
+  .main .project,
+  .main .todo,
+  .main .new-project,
+  .main .new-todo {
+    margin: 5px 0;
+    padding: 10px 20px;
+    border-radius: 3px;
+    background: #fafafa;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.16), 0 2px 5px rgba(0, 0, 0, 0.23);
+    cursor: pointer; }
+  .main .project:hover,
+  .main .todo:hover,
+  .main .new-project:hover,
+  .main .new-todo:hover {
+    background: #f4f5f7; }
+  .main .project-main {
+    display: flex; }
+    .main .project-main .edit-project {
+      margin-left: auto;
+      margin-right: 12px; }
+  .main .new-todo-form {
+    display: flex;
+    align-items: center; }
+
+.projects-title,
+.todos-title {
+  text-transform: uppercase;
+  text-align: center;
+  margin: 0 20px 15px;
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(92, 92, 92, 0.1); }
+
+.edit-form button[type='submit'],
+.new-project-form button[type='submit'],
+.new-todo-form button[type='submit'] {
+  margin-left: auto;
+  margin-right: 12px; }
+
+.active {
+  background: #e6e6e6 !important; }
+
+input,
+select,
+textarea {
+  outline: none;
+  border-radius: 3px;
+  padding: 0 10px;
+  width: 75%;
+  font-family: inherit;
+  font-size: inherit;
+  border: 1px solid #e6e6e6; }
+
+input[type='checkbox'] {
+  display: none; }
+
+label {
+  display: inline-flex;
+  align-items: center; }
+
+label::before {
+  content: '\2714';
+  border: 1px solid #dadada;
+  border-radius: 50%;
+  color: transparent;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 20px; }
+
+input[type='checkbox']:checked + label::before {
+  color: #5dc2af; }
+
+button {
+  border: none;
+  background: none;
+  outline: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center; }
+
+i {
+  font-size: 0.9rem; }
+
+.submit-button {
+  color: #5dc2af; }
+
+.cancel {
+  color: #df6c6c; }
+
+.hide {
+  display: none !important; }
+
+.urgent {
+  background-color: #f7e6e6 !important; }
 

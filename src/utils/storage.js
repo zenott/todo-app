@@ -4,9 +4,29 @@ const storeName = 'projects';
 
 const initialData = [
   {
-    name: 'project1',
+    name: 'Default project',
     todos: [
-      { title: 'todo1', description: '', dueDate: '', isDone: '', priority: '' }
+      {
+        title: 'todo',
+        description: 'todo  description',
+        dueDate: new Date(Date.now() + 864000000),
+        isDone: '',
+        priority: ''
+      },
+      {
+        title: 'important todo',
+        description: '',
+        dueDate: new Date(Date.now() + 259200000),
+        isDone: '',
+        priority: 'urgent'
+      },
+      {
+        title: 'another todo',
+        description: '',
+        dueDate: '',
+        isDone: true,
+        priority: 'normal'
+      }
     ]
   }
 ];

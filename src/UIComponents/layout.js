@@ -13,6 +13,10 @@ const buildLayout = () => {
   const projects = document.createElement('div');
   projects.classList.add('projects');
 
+  const projectsTitle = document.createElement('h3');
+  projectsTitle.classList.add('projects-title');
+  projectsTitle.textContent = 'Projects';
+
   const newProjectButton = document.createElement('div');
   newProjectButton.classList.add('new-project-button');
   newProjectButton.textContent = '+ new project';
@@ -25,14 +29,20 @@ const buildLayout = () => {
   newProject.classList.add('new-project');
   newProject.appendChild(newProjectButton);
   newProject.appendChild(projectform);
+
+  projects.appendChild(projectsTitle);
   projects.appendChild(newProject);
 
   const todos = document.createElement('div');
   todos.classList.add('todos');
 
+  const todosTitle = document.createElement('h3');
+  todosTitle.classList.add('todos-title');
+  todosTitle.textContent = 'Todos';
+
   const newTodoButton = document.createElement('div');
   newTodoButton.classList.add('new-todo-button');
-  newTodoButton.textContent = '+ Add a todo';
+  newTodoButton.textContent = '+ add todo';
   newTodoButton.addEventListener('click', toggleNewTodo);
 
   const todoForm = buildNewTodoForm();
@@ -42,6 +52,8 @@ const buildLayout = () => {
   newTodo.classList.add('new-todo');
   newTodo.appendChild(newTodoButton);
   newTodo.appendChild(todoForm);
+
+  todos.appendChild(todosTitle);
   todos.appendChild(newTodo);
 
   main.appendChild(projects);
