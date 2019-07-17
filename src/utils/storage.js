@@ -1,6 +1,6 @@
 import * as events from '../utils/events';
 
-const storeName = 'projects';
+const storeName = 'todo_app_projects';
 
 const initialData = [
   {
